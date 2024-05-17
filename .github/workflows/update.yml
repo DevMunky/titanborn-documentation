@@ -43,7 +43,7 @@ jobs:
     - run: git checkout master
     - name: run python
       run: python update-version.py versions.yml ${{ inputs.key }} ${{ inputs.value }}
-    - name: Commit files  # transfer the new html files back into the repository
+    - name: Commit files
       run: |
         git config --local user.name  ${{ github.actor }}        
         git config --local user.email "${{ github.actor }}@users.noreply.github.com"
