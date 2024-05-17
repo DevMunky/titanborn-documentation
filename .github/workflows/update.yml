@@ -1,0 +1,52 @@
+# This is a basic workflow that is manually triggered
+
+name: Manual workflow
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+  workflow_dispatch:
+    # Inputs the workflow accepts.
+    inputs:
+      key:
+        # Friendly description to be shown in the UI instead of 'name'
+        description: 'Key of versions file to modify'
+        # Default value if no value is explicitly provided
+        default: 'null'
+        # Input has to be provided for the workflow to run
+        required: true
+        # The data type of the input
+        type: string
+      value:
+        # Friendly description to be shown in the UI instead of 'name'
+        description: 'Value of versions file to modify, typically plugin name'
+        # Default value if no value is explicitly provided
+        default: 'null'
+        # Input has to be provided for the workflow to run
+        required: true
+        # The data type of the input
+        type: string
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "greet"
+  update-file:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Runs a single command using the runners shell
+    - uses: actions/checkout@v4
+    - run: git checkout master
+    - name: run python
+      run: python update-version.py versions.yml ${{ inputs.key }} ${{ inputs.value }}
+    - name: Commit files  # transfer the new html files back into the repository
+      run: |
+        git config --local user.name  ${{ github.actor }}        
+        git config --local user.email "${{ github.actor }}@users.noreply.github.com"
+        git add ./versions.yml
+        git commit -m "Automatically updating version of ${{ inputs.key }} to ${{ inputs.value }}"
+    - name: push changes
+      run: |
+        git push origin master
